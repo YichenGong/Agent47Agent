@@ -12,6 +12,8 @@ python run_battle.py --agents=player::arrows,test::agents.SimpleAgent,random::nu
 An example with a docker agent:
 python run_battle.py --agents=player::arrows,docker::pommerman/test-agent,random::null,random::null --config=PommeFFA-v0
 """
+import sys
+sys.path.append('/Users/Yichen/Documents/Projects/Pommerman/first_competition_stable/playground')
 import atexit
 import os
 import random
@@ -20,8 +22,8 @@ import time
 import argparse
 import numpy as np
 
-from .. import helpers
-from .. import make
+from pommerman import helpers
+from pommerman import make
 
 
 def run(args, num_times=1, seed=None):
