@@ -4,3 +4,11 @@ from .player_agent import PlayerAgent
 from .random_agent import RandomAgent
 from .simple_agent import SimpleAgent
 from .tensorforce_agent import TensorForceAgent
+from .yichen_agent import YichenAgent
+from .aggressive_agent import AggressiveAgent
+from .mcts_agent import MCTSAgent
+from .state_agent_exploit import StateAgentExploit
+from .state_agent_explore import StateAgentExplore
+from .state_agent_standard import StateAgentStandard
+from .state_agent_bfs import StateAgentBFS
+from .dummy_agent import DummyAgent

@@ -1,0 +1,30 @@
+{'result': <Result.Tie: 2>}
+{'result': <Result.Win: 0>, 'winners': [0]}
+{'result': <Result.Win: 0>, 'winners': [2]}
+{'result': <Result.Win: 0>, 'winners': [0]}
+{'result': <Result.Win: 0>, 'winners': [0]}
+{'result': <Result.Win: 0>, 'winners': [3]}
+{'result': <Result.Win: 0>, 'winners': [0]}
+{'result': <Result.Win: 0>, 'winners': [1]}
+{'result': <Result.Win: 0>, 'winners': [0]}
+{'result': <Result.Win: 0>, 'winners': [0]}
+{'result': <Result.Win: 0>, 'winners': [0]}
+{'result': <Result.Win: 0>, 'winners': [0]}
+{'result': <Result.Tie: 2>}
+{'result': <Result.Win: 0>, 'winners': [0]}
+{'result': <Result.Win: 0>, 'winners': [3]}
+{'result': <Result.Win: 0>, 'winners': [0]}
+{'result': <Result.Win: 0>, 'winners': [0]}
+{'result': <Result.Win: 0>, 'winners': [3]}
+{'result': <Result.Win: 0>, 'winners': [0]}
+{'result': <Result.Win: 0>, 'winners': [0]}
+{'result': <Result.Tie: 2>}
+{'result': <Result.Win: 0>, 'winners': [0]}
+{'result': <Result.Win: 0>, 'winners': [2]}
+{'result': <Result.Win: 0>, 'winners': [0]}
+{'result': <Result.Win: 0>, 'winners': [0]}
+{'result': <Result.Win: 0>, 'winners': [0]}
+{'result': <Result.Win: 0>, 'winners': [2]}
+{'result': <Result.Win: 0>, 'winners': [0]}
+{'result': <Result.Win: 0>, 'winners': [0]}
+{'result': <Result.Win: 0>, 'winners': [0]}
