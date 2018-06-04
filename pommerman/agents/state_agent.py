@@ -987,11 +987,15 @@ class StateAgent(BaseAgent):
         return False
 
     def is_start(self): 
-        
+        pos = len(self.board) - 2
+        return self.my_position in [(1,1),(pos,1),(pos,pos),(1,pos)] and \
+            self.ammo == 1 and \
+            self.blast_strength == constants.DEFAULT_BLAST_STRENGTH and \
+            not self.obs['can_kick']
         # return self.my_position == self.start_position and \
         #     self.ammo == 1 and \
         #     self.is_alive == True and \
         #     self.blast_strength == constants.DEFAULT_BLAST_STRENGTH and \
         #     self.can_kick == False 
-        return False
+        # return False
         
