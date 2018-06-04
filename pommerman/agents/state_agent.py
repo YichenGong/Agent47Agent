@@ -987,7 +987,7 @@ class StateAgent(BaseAgent):
         return False
 
     def is_start(self): 
-        # print(dir(self))
+        
         # return self.my_position == self.start_position and \
         #     self.ammo == 1 and \
         #     self.is_alive == True and \

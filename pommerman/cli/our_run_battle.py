@@ -13,9 +13,10 @@ An example with a docker agent:
 python run_battle.py --agents=player::arrows,docker::pommerman/test-agent,random::null,random::null --config=ffa_v0
 """
 
-import sys
-#sys.path.append('/Users/Yichen/Documents/NYU/2018 SPRING/Game AI/project/CutePrommerman')
-sys.path.append('/Users/Yichen/Documents/Projects/Pommerman/first_competition_stable/playground')
+import os 
+cwd = os.getcwd()
+import sys 
+sys.path.append("/".join(cwd.split("/")[:-2]))
 
 import atexit
 import os

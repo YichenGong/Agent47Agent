@@ -12,8 +12,12 @@ python run_battle.py --agents=player::arrows,test::agents.SimpleAgent,random::nu
 An example with a docker agent:
 python run_battle.py --agents=player::arrows,docker::pommerman/test-agent,random::null,random::null --config=PommeFFA-v0
 """
-import sys
-sys.path.append('/Users/Yichen/Documents/Projects/Pommerman/first_competition_stable/playground')
+# import sys
+# sys.path.append('/Users/Yichen/Documents/Projects/Pommerman/first_competition_stable/playground')
+import os 
+cwd = os.getcwd()
+import sys 
+sys.path.append("/".join(cwd.split("/")[:-2]))
 import atexit
 import os
 import random
