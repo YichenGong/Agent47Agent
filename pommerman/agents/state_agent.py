@@ -92,9 +92,9 @@ class StateAgent(BaseAgent):
         if self._closest_safe_positions not in self.prev: 
             self._closest_safe_positions = ()
 
-#--------------------------------------
-#========Visit Map Initialization==============
-#--------------------------------------
+        #--------------------------------------
+        #========Visit Map Initialization==============
+        #--------------------------------------
         if self.is_start():
             self._closest_safe_positions = () 
             self._prev_direction = []
@@ -107,9 +107,9 @@ class StateAgent(BaseAgent):
                     else:
                         self._visit_map[i][j] = 0
 
-#--------------------------------------
-#=========Yichen Safe Direction========
-#--------------------------------------
+        #--------------------------------------
+        #=========Yichen Safe Direction========
+        #--------------------------------------
         
         if len(self._closest_safe_positions) != 0 and self._closest_safe_positions != (-1,-1): 
             direction = helper_func.get_next_direction_according_to_prev(self.my_position, self._closest_safe_positions, self.prev)
@@ -129,8 +129,7 @@ class StateAgent(BaseAgent):
                 #=======
                 if helper_func.check_if_in_bomb_range_threshold(self.board, self.bombs,\
                                                                 utility.get_next_position(self.my_position, direction)):
-                    #print("safe MCTS: ", self.obs['can_kick'])
-                    # actions_space = range(5)
+                    
                     directions = [constants.Action.Stop, constants.Action.Left, constants.Action.Right, constants.Action.Up, constants.Action.Down]
                     directions = self._filter_unsafe_directions(self.board, self.my_position, directions, self.bombs, self.items, self.dist, self.prev, self.enemies)
                     actions_space = [dir.value for dir in directions]
@@ -150,9 +149,9 @@ class StateAgent(BaseAgent):
             else:
                 self._closest_safe_positions = ()
         
-#--------------------------------------
-#=============State Agent==============
-#--------------------------------------
+        #--------------------------------------
+        #=============State Agent==============
+        #--------------------------------------
         [output, Att, Exp, Evd] = [constants.Action.Stop.value] + [-1] * 3
         if self.EvaderCondition(): 
             Evd = self.EvaderAction()
@@ -160,16 +159,11 @@ class StateAgent(BaseAgent):
             Att = self.AttackerAction()
             print("ATTACK ACTION", Att)
             if Att == 5 and not self._maybe_bomb(self.ammo, self.blast_strength, self.items, self.dist, self.my_position, self.board, self.prev, self.enemies, self.bombs):
-                #print("Not safe, Evade")
-                Att = 0#self.EvaderAction()
+                Att = 0
             elif Att == -1:
                 Att = self.ExplorerAction()
         elif self.ExplorerCondition():
             Exp = self.ExplorerAction()
-        #print(self.board)
-        #print(obs['bomb_life'])
-        #print(self._closest_safe_positions)
-        #print(Evd, Att, Exp)
         if Evd is not -1:
             output = Evd
             print("170 Evader ", output)
@@ -180,43 +174,29 @@ class StateAgent(BaseAgent):
             output = Exp
             print("176 Explorer", output)
 
-        # output = self.bomb_if_towards_negative(output)
         if type(output) != int:
             return output.value
         return output
 
     def AttackerCondition(self):
         #return self._state is State.Attacker
-        return self._state is State.Attacker or (self.ammo >= 1 and self._near_enemy(self.my_position, self.items, self.dist, self.prev, self.enemies, 5))
+        return self._state is State.Attacker or (self.ammo >= 1 and helper_func._near_enemy(self.my_position, self.items, self.dist, self.prev, self.enemies, 5))
 
     def ExplorerCondition(self):
         return self._state is State.Explorer
 
     def EvaderCondition(self):
-        self.unsafe_directions = self._directions_in_range_of_bomb(self.board, self.my_position, self.bombs, self.dist)
+        self.unsafe_directions = helper_func._directions_in_range_of_bomb(self.board, self.my_position, self.bombs, self.dist)
         return self.unsafe_directions
 
     def AttackerAction(self):
         raise NotImplementedError()
 
     def ExplorerAction(self):
-        #============
-        #BOMB NEGATIVE ITEM
-        #============
-        # bomb_count = self._near_bomb_item(self.my_position, self.items, self.dist, self.prev, 1)
-        # bomb_count = self.count_bomb_in_radius(my_position, bombs, items, radius=4)
-        # helper_func.agent_output(["NEGATIVE", bomb_count])
-        # if bomb_count > 1:
-        #     if self._maybe_bomb(self.ammo, self.blast_strength, self.items, self.dist, self.my_position, self.board, self.prev, self.enemies, self.bombs):
-        #         helper_func.agent_output(["No. 510"])
-        #         return constants.Action.Bomb.value
-
         #===========
         #MOVE TOWARDS GOOD ITEM
         #===========
         # Move towards a good item if there is one within eight reachable spaces.
-        #directions = list(filter(lambda x: x != self._prev_direction,
-        #helper_func.direction_to_items(self.my_position, self.items, self.dist, self.prev, 15)))
         directions =  helper_func.direction_to_items(self.my_position, self.items, self.dist, self.prev, 15)
         if directions is not None and len(directions) != 0:
             directions = self._filter_unsafe_directions(self.board, self.my_position, directions, self.bombs, self.items, self.dist, self.prev, self.enemies)
@@ -310,7 +290,7 @@ class StateAgent(BaseAgent):
             directions = [constants.Action.Left, constants.Action.Right, constants.Action.Up, constants.Action.Down] 
             directions = self._filter_kicking_direction(self.board, self.my_position, directions, self.enemies)
             directions += [constants.Action.Stop]
-            directions = self._filter_direction_toward_flames(self.board, self.my_position, directions, self.enemies)
+            directions = helper_func._filter_direction_toward_flames(self.board, self.my_position, directions, self.enemies)
             self._no_safe_position_step = 1             
             rtn = random.choice(directions).value 
             helper_func.agent_output(["308", self._closest_safe_positions, \
@@ -346,14 +326,6 @@ class StateAgent(BaseAgent):
 
         self._prev_direction = direction
         return direction
-
-    #place down bomb if going towards negative item
-    # def bomb_if_towards_negative(self, direction):
-    #     if direction in [constants.Action.Up, constants.Action.Down, constants.Action.Left, constants.Action.Right]\
-    #        and self.board[utility.get_next_position(self.my_position, direction)] == constants.Item.Skull.value:
-    #         return constants.Action.Bomb.value
-    #     else:
-    #         return direction
     
     def find_bombing_agents(self, bomb_life_map, board):
         #only add initial bombs
@@ -398,8 +370,8 @@ class StateAgent(BaseAgent):
             self.bombing_agents.pop(k, None)
         for k in keys_to_add:
             self.bombing_agents[k[0]] = k[1]
-            #print(self.bombing_agents)
-        # input("main mcts updating for kick")
+        
+        
 
 #--------------------------------------
 #======================================
@@ -410,8 +382,7 @@ class StateAgent(BaseAgent):
         assert(depth is not None)
 
         if exclude is None:
-            exclude = [constants.Item.Fog]#, #constants.Item.Rigid,
-                       #constants.Item.Flames] # SKULL
+            exclude = [constants.Item.Fog]
 
         def out_of_range(p1, p2):
             x1, y1 = p1
@@ -439,7 +410,6 @@ class StateAgent(BaseAgent):
                 dist[position] = np.inf
 
                 prev[position] = None
-                # Q.put((dist[position], position))
                 item = constants.Item(board[position])
                 items[item].append(position)
         dist[my_position] = 0
@@ -458,98 +428,34 @@ class StateAgent(BaseAgent):
                         utility.position_is_passable(board, new_position, enemies)]):
 
                         new_val = val
-                        #Manually increase the distance to the skull
-                        # if board[new_position[0], new_position[1]] == constants.Item.Skull.value:
-                        #     new_val += 4
-
                         if new_val < dist[new_position]:
                             dist[new_position] = new_val
                             prev[new_position] = position 
                             Q.put((dist[new_position], new_position))
         return items, dist, prev 
 
-    @classmethod
-    def _directions_in_range_of_bomb(self, board, my_position, bombs, dist, bomb_ticking_threshold = 15, consider_bomb_life = True):
-        ret = defaultdict(int)
-
-        x, y = my_position
-
-        # BOMB connection
-        for i in range(len(bombs)):
-            for j in range(len(bombs)):
-                if i == j:
-                    continue
-                bombs[i], bombs[j] = self._connect_bomb(bombs[i], bombs[j])
-
-        for bomb in bombs:
-            position = bomb['position'] 
-            bomb_life = bomb['bomb_life']
-            distance = dist.get(position)
-
-            path_bombable = helper_func.path_is_bombable(board, my_position, position, bombs)
-            if path_bombable: 
-                distance = helper_func.get_manhattan_distance(my_position, position)
-
-            if distance is None:
-                continue
-
-            if my_position == position:
-                # We are on a bomb. All directions are in range of bomb.
-                for direction in [
-                    constants.Action.Right,
-                    constants.Action.Left,
-                    constants.Action.Up,
-                    constants.Action.Down,
-                ]:
-                    ret[direction] = max(ret[direction], bomb['blast_strength'])
-
-            bomb_range = bomb['blast_strength']
-
-            if (distance > bomb_range and my_position != position and not path_bombable) \
-                    or (bomb_life > distance + bomb_ticking_threshold and consider_bomb_life) :
-                continue
-
-
-            if x == position[0]:
-                if y < position[1]:
-                    # Bomb is right.
-                    ret[constants.Action.Right] = max(ret[constants.Action.Right], bomb['blast_strength'])
-                else:
-                    # Bomb is left.
-                    ret[constants.Action.Left] = max(ret[constants.Action.Left], bomb['blast_strength'])
-            elif y == position[1]:
-                if x < position[0]:
-                    # Bomb is down.
-                    ret[constants.Action.Down] = max(ret[constants.Action.Down], bomb['blast_strength'])
-                else:
-                    # Bomb is down.
-                    ret[constants.Action.Up] = max(ret[constants.Action.Up], bomb['blast_strength'])
-        return ret
-
 
     def _update_safe_position(self, bombs, board, my_position, items, dist, prev, enemies):
 
         sorted_dist = {k:v for  k, v in dist.items() if v < 15 and not helper_func.position_is_not_passible(board, k, enemies)}
-        sorted_dist = sorted(sorted_dist, key=lambda position: dist[position]) #+ helper_func.get_manhattan_distance(my_position, position)) 
-        # bomb_count = self.count_bomb_in_radius(my_position, bombs, items, radius=4)
+        sorted_dist = sorted(sorted_dist, key=lambda position: dist[position]) 
+        
         safe_positions = queue.PriorityQueue()
         best_dist = 99999
         for position in sorted_dist: 
-            unsafe_directions = self._directions_in_range_of_bomb(board, position, bombs, dist, bomb_ticking_threshold=15)#bomb_count * 2 + 3) 
-            # potential_unsafe_directions = self._directions_in_range_of_bomb(board, position, bombs, dist, bomb_ticking_threshold=15)#)bomb_count * 2 + 3, consider_bomb_life=False) 
-            position_is_bad_corner = self.is_bad_corner(board, my_position, position, items, dist, prev, enemies, distance_to_enemies=3, threshold_wall_count = 2)
+            unsafe_directions = helper_func._directions_in_range_of_bomb(board, position, bombs, dist, bomb_ticking_threshold=15)
+            
+            position_is_bad_corner = helper_func.is_bad_corner(board, my_position, position, items, dist, prev, enemies, distance_to_enemies=3, threshold_wall_count = 2)
             
 
-            if len(unsafe_directions) == 0 and not position_is_bad_corner: # and len(potential_unsafe_directions) == 0:
-                # helper_func.agent_output(["SAFE POSITION BOARD",
-                #                          position, my_position, board])
+            if len(unsafe_directions) == 0 and not position_is_bad_corner:
                 if dist[position] <= best_dist:
                     best_dist = dist[position]
                     # calculate threat during escaping 
                     num_threats = 0 
                     curr_position = position
                     while prev[curr_position] != my_position: 
-                        unsafe_dir = self._directions_in_range_of_bomb(board, curr_position, bombs, dist, bomb_ticking_threshold=15)
+                        unsafe_dir = helper_func._directions_in_range_of_bomb(board, curr_position, bombs, dist, bomb_ticking_threshold=15)
                         if len(unsafe_dir) != 0:
                             num_threats += 1
                         curr_position = prev[curr_position]
@@ -691,21 +597,21 @@ class StateAgent(BaseAgent):
         if ammo < 1:
             return False
         
-        # if self.count_bomb_in_radius(my_position, bombs, items, 4) >= 3:
+        # if helper_func.count_bomb_in_radius(my_position, bombs, items, 4) >= 3:
         #     return False 
         
         # if  self._directions_in_range_of_bomb(board, my_position, bombs, dist, consider_bomb_life=False): #current position connects other bombs
         #     return False
 
         copy_bombs = copy.deepcopy(self.bombs)
-        copy_bombs.append({'position': my_position, 'blast_strength': int(self.blast_strength), 'bomb_life': 10, 'moving_direction': None})
+        copy_bombs.append({'position': my_position, 'blast_strength': int(blast_strength), 'bomb_life': 10, 'moving_direction': None})
         
         # Will we be stuck?
         x, y = my_position
         for position in items.get(constants.Item.Passage):
             if dist[position] > 5 or utility.position_is_agent(board,position) \
-               or self._directions_in_range_of_bomb(board, position, copy_bombs, dist, consider_bomb_life=False) \
-               or self.is_bad_corner(board, my_position, position, items, dist, prev, enemies, distance_to_enemies=3, threshold_wall_count = 3) \
+               or helper_func._directions_in_range_of_bomb(board, position, copy_bombs, dist, consider_bomb_life=False) \
+               or helper_func.is_bad_corner(board, my_position, position, items, dist, prev, enemies, distance_to_enemies=3, threshold_wall_count = 3) \
                or self.susceptible_to_path_bombing(copy_bombs, my_position, position, dist, radius=4):
                 continue
 
@@ -725,57 +631,6 @@ class StateAgent(BaseAgent):
 
         return False
 
-    @staticmethod
-    def _nearest_position(dist, objs, items, radius):
-        nearest = None
-        # dist_to = max(dist.values())
-        dist_to = 999999
-
-        for obj in objs:
-            for position in items.get(obj, []):
-                d = dist[position]
-                if d <= radius and d <= dist_to:
-                    nearest = position
-                    dist_to = d
-        
-        return nearest
-
-    @staticmethod
-    def _get_direction_towards_position(my_position, position, prev):
-        if not position:
-            return None
-
-        next_position = position
-        while prev[next_position] != my_position:
-            next_position = prev[next_position]
-
-        return utility.get_direction(my_position, next_position)
-
-    @classmethod
-    def _near_enemy(cls, my_position, items, dist, prev, enemies, radius):
-        nearest_enemy_position = cls._nearest_position(dist, enemies, items, radius)
-        return cls._get_direction_towards_position(my_position, nearest_enemy_position, prev)
-
-    @classmethod
-    def _near_good_powerup(cls, my_position, items, dist, prev, radius):
-        objs = [
-            constants.Item.ExtraBomb,
-            constants.Item.IncrRange,
-            constants.Item.Kick
-        ]
-        nearest_item_position = cls._nearest_position(dist, objs, items, radius)
-        return cls._get_direction_towards_position(my_position, nearest_item_position, prev)
-
-    @classmethod
-    def _near_item(cls, my_position, items, dist, prev, radius):
-        objs = [
-            constants.Item.ExtraBomb,
-            constants.Item.IncrRange,
-            constants.Item.Kick
-        ]
-        nearest_item_position = cls._nearest_position(dist, objs, items, radius)
-        return cls._get_direction_towards_position(my_position, nearest_item_position, prev)
-
     @classmethod
     def _near_wood(cls, my_position, items, dist, prev, radius):
         objs = [constants.Item.Wood]
@@ -783,8 +638,6 @@ class StateAgent(BaseAgent):
         return cls._get_direction_towards_position(my_position, nearest_item_position, prev)
 
     def _near_bomb_item(self, my_position, items, dist, prev, radius):
-        #objs = [constants.Item.Skull]
-        #nearest_item_position = cls._nearest_position(dist, objs, items, radius)
         counter = 0
         directions = [constants.Action.Up, constants.Action.Down, constants.Action.Left, constants.Action.Right]
         for d in directions:
@@ -803,41 +656,6 @@ class StateAgent(BaseAgent):
                 ret.append(direction)
         return ret
 
-    @staticmethod
-    def _count_adjacent_walls(board, position, items, enemies):
-        walls_count = 0 
-        not_passible_items = items[constants.Item.Wood] + items[constants.Item.Rigid] + items[constants.Item.Bomb] + items[constants.Item.Flames] 
-
-        for enemy in enemies: 
-            not_passible_items += items.get(enemy, [])
-
-        
-        
-        for direction in [constants.Action.Up, constants.Action.Down, constants.Action.Left, constants.Action.Right]:
-            new_pos = utility.get_next_position(position, direction)
-            
-            if not utility.position_on_board(board, new_pos) or \
-               new_pos in not_passible_items:
-                walls_count = walls_count + 1
-
-        return walls_count
-
-    @staticmethod
-    def _check_enemy_near_hallway(board, my_position, new_position, enemies):
-        def if_passable(pos):
-            return not utility.position_on_board(board, pos)
-
-        #check if it is a hallway
-        pos_up = utility.get_next_position(new_position, constants.Action.Up)
-        pos_down = utility.get_next_position(new_position, constants.Action.Down)
-        pos_left = utility.get_next_position(new_position, constants.Action.Left)
-        pos_right = utility.get_next_position(new_position, constants.Action.Right)
-        #if if_passable(pos_up) and if_passable(pos_down):
-            
-        #elif if_passable(pos_left) and if_passable(pos_right):
-        
-        return False
-        #    cls._get_direction_towards_position
 
     @classmethod
     def _filter_unsafe_directions(self, board, my_position, directions, bombs, items, dist, prev, enemies):
@@ -849,8 +667,8 @@ class StateAgent(BaseAgent):
             x, y = utility.get_next_position(my_position, direction)
 
             is_bad = False 
-            unsafe_directions = self._directions_in_range_of_bomb(board, (x,y), bombs, dist) 
-            is_bad_corner = self.is_bad_corner(board, my_position, (x,y), items, dist, prev, enemies, distance_to_enemies=-1, threshold_wall_count = 4)
+            unsafe_directions = helper_func._directions_in_range_of_bomb(board, (x,y), bombs, dist) 
+            is_bad_corner = helper_func.is_bad_corner(board, my_position, (x,y), items, dist, prev, enemies, distance_to_enemies=-1, threshold_wall_count = 4)
             if len(unsafe_directions) != 0:
                 is_bad = True 
             
@@ -901,56 +719,6 @@ class StateAgent(BaseAgent):
                                 path_to_items[position] = new_position
                     distance_to_items[position] = min_dist
         return distance_to_items, path_to_items  
-
-    @classmethod
-    def is_bad_corner(self, board, my_position, target_position, items, dist, prev, enemies, distance_to_enemies, threshold_wall_count=3):
-        wall_count = self._count_adjacent_walls(board, target_position, items, enemies) 
-        if distance_to_enemies == -1:
-            if wall_count >= threshold_wall_count:
-                return True 
-            else:
-                return False
-        else:
-            if wall_count >= threshold_wall_count and self._near_enemy(my_position, items, dist, prev, enemies, distance_to_enemies):
-                return True 
-            else:
-                return False 
-
-    @classmethod
-    def _connect_bomb(self,bomb1, bomb2):
-        position1 = bomb1['position']
-        x1, y1 = position1
-        bomb_life1 = bomb1['bomb_life'] 
-        bomb_range1 = bomb1['blast_strength']
-
-        position2 = bomb2['position']
-        x2, y2 = position2
-        bomb_life2 = bomb2['bomb_life'] 
-        bomb_range2 = bomb2['blast_strength'] 
-
-        bomb_connected = False
-        if x1 == x2:
-            bomb_dist = abs(y1 - y2)
-            if bomb_dist < bomb_range1 + 1 or bomb_dist < bomb_range2 + 1: 
-                bomb_connected = True                         
-        elif y1 == y2:
-            bomb_dist = abs(x1 - x2)
-            if bomb_dist < bomb_range1 + 1 or bomb_dist < bomb_range2 + 1: 
-                bomb_connected = True 
-        if bomb_connected:
-            min_bomb_life = min(bomb_life1, bomb_life2)
-            bomb1['bomb_life'] = min_bomb_life 
-            bomb2['bomb_life'] = min_bomb_life 
-        
-        return bomb1, bomb2 
-    
-    def count_bomb_in_radius(self, my_position, bombs, items, radius): 
-        count = 0 
-        for position in items.get(constants.Item.Bomb,[]):
-            if helper_func.get_manhattan_distance(position, my_position) <= radius: 
-                count += 1
-        return count 
-    
     
     @staticmethod
     def _filter_kicking_direction(board, my_position, directions, enemies):
@@ -961,14 +729,7 @@ class StateAgent(BaseAgent):
                 ret.append(direction)
         return ret 
     
-    @staticmethod 
-    def _filter_direction_toward_flames(board, my_position, directions, enemies):
-        ret = []
-        for direction in directions:
-            position = utility.get_next_position(my_position, direction)
-            if utility.position_on_board(board, position) and not utility.position_is_flames(board, position):
-                ret.append(direction)
-        return ret
+    
     
     @classmethod 
     def susceptible_to_path_bombing(self, bombs, my_position, position, dist, radius=4):
@@ -977,7 +738,7 @@ class StateAgent(BaseAgent):
             for j in range(len(copy_bombs)):
                 if i == j:
                     continue
-                copy_bombs[i], copy_bombs[j] = self._connect_bomb(copy_bombs[i], copy_bombs[j]) 
+                copy_bombs[i], copy_bombs[j] = helper_func._connect_bomb(copy_bombs[i], copy_bombs[j]) 
         
         for bomb in copy_bombs: 
             if bomb['position'] not in dist:
@@ -992,10 +753,5 @@ class StateAgent(BaseAgent):
             self.ammo == 1 and \
             self.blast_strength == constants.DEFAULT_BLAST_STRENGTH and \
             not self.obs['can_kick']
-        # return self.my_position == self.start_position and \
-        #     self.ammo == 1 and \
-        #     self.is_alive == True and \
-        #     self.blast_strength == constants.DEFAULT_BLAST_STRENGTH and \
-        #     self.can_kick == False 
-        # return False
+
         
