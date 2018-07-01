@@ -79,11 +79,17 @@ class State():
                         if agent.agent_id + 10 == enemyId:
                             agent_idx = j 
                             break 
+                    # ignore teammate at all, otherwise, try to replace teammate, and enemy at the same time
                     
+                    if not agent_idx:
+                        actions[i] = 0
+                        continue
                     agent_val = copy_obs['enemies'][agent_idx] if type(copy_obs['enemies'][agent_idx]) == int else copy_obs['enemies'][agent_idx].value
                     del copy_obs['enemies'][agent_idx]
                     copy_obs['enemies'].append(self.self_agent)
                     # modify my position 
+
+                    
                     my_position = np.where(self._board == agent.agent_id + 10)
                     copy_obs['position'] = (my_position[0][0], my_position[1][0])
                     # fuse_everything_in_new_obs
@@ -195,6 +201,7 @@ class State():
                     # print("bombing while on bomb, skip")
                     continue
 
+                print(move)
                 temp_board, temp_curr_agent,temp_curr_bombs, temp_curr_items, temp_curr_flames, bombing_agents = self.advance_game_on_copy(move)
 
                 temp_obs = self.fm.get_observations(temp_board, temp_curr_agent,temp_curr_bombs, False, 11)[self.self_agent_value - 10 ]
@@ -241,7 +248,10 @@ class State():
                         if agent.agent_id + 10 == enemy.value:
                             agent_idx = j 
                             break 
-                    
+                    if not agent_idx:
+                        actions[i] = 0
+                        continue
+
                     agent_val = copy_obs['enemies'][agent_idx].value
                     del copy_obs['enemies'][agent_idx]
                     copy_obs['enemies'].append(self_agent)

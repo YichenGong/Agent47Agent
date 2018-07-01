@@ -22,8 +22,10 @@ def agent_output(output_array, enabled = 0):
         for s in output_array:
             print(s)
 
+
 def position_is_flame(board, position):
     return utility._position_is_item(board, position, constants.Item.Flames)
+
 
 def position_is_bombable(board, position, bombs): 
     return  any([utility.position_is_agent(board, position),
